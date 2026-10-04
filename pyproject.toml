@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "feko-mcp"
+version = "0.1.0"
+description = "Local MCP bridge for CADFEKO, the FEKO solver, and POSTFEKO"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["mcp>=1.30,<2"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: Microsoft :: Windows",
+  "Topic :: Scientific/Engineering",
+]
+
+[project.urls]
+Repository = "https://github.com/Zircon04/feko-mcp"
+Issues = "https://github.com/Zircon04/feko-mcp/issues"
+
+[project.scripts]
+feko-mcp = "feko_mcp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+feko_mcp = ["examples/*.lua", "examples/*.md"]

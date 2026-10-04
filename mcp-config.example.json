@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "feko": {
+      "command": "C:\\path\\to\\feko-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "feko_mcp"],
+      "env": {
+        "FEKO_HOME": "C:\\Program Files\\Altair\\2026.1",
+        "FEKO_MCP_WORKSPACE": "C:\\path\\to\\feko-jobs"
+      }
+    }
+  }
+}
