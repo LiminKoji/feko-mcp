@@ -74,6 +74,31 @@ class ServerTests(unittest.TestCase):
             self.server.start_stage(directory, "post", [sys.executable], {"export.lua": "replacement"})
         self.assertEqual((directory / "export.lua").read_text(), "original")
 
+    def test_terminal_status_with_lock_rejects_start_until_cleanup(self):
+        directory = self.server.new_job()
+        (directory / "status_solve.json").write_text(json.dumps(
+            {"stage": "solve", "state": "completed", "exit_code": 0}))
+        lock = directory / ".stage.lock"
+        lock.touch()
+        script = directory / "export.lua"
+        script.write_text("original")
+        with patch.object(self.server.subprocess, "Popen") as launch, \
+                patch.object(self.server.threading, "Thread"):
+            with self.assertRaisesRegex(ValueError, "starting/running stage"):
+                self.server.start_stage(directory, "post", ["fake-post"],
+                                        {"export.lua": "replacement"})
+            launch.assert_not_called()
+            self.assertEqual(script.read_text(), "original")
+            self.assertFalse((directory / "request_post.json").exists())
+            self.assertFalse((directory / "status_post.json").exists())
+            lock.unlink()
+            started = self.server.start_stage(directory, "post", ["fake-post"],
+                                              {"export.lua": "replacement"})
+            launch.assert_called_once()
+            self.assertEqual(started["state"], "starting")
+            self.assertEqual(script.read_text(), "replacement")
+            self.assertTrue(lock.exists())
+
     def test_solver_uses_basename_and_configurable_core_limit(self):
         directory = self.server.new_job()
         (directory / "model.cfx").touch()
